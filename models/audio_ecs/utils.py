@@ -8,8 +8,29 @@ import os
 from pathlib import Path
 import torchaudio
 import numpy as np
+from transformers import BertModel, BertConfig
 
 DEVICE = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+LOSS_CRITERIA = nn.CrossEntropyLoss()
+
+class BertForSequenceLabeling(nn.Module):
+    def __init__(self, num_labels=50):
+        super(BertForSequenceLabeling, self).__init__()
+        self.bert = BertModel.from_pretrained('bert-base-uncased')
+        set_parameter_requires_grad(self.bert, feature_extracting=True)
+        end_input_features = self.bert.pooler.dense.in_features
+        self.bert.pooler.dense = nn.Linear(end_input_features,num_labels)
+        self.num_labels = num_labels  # Store num_labels as an instance variable
+
+    def forward(self, input_ids, attention_mask=None):
+        # Transform the embeddings to BERT-compatible dimensions
+        # Pass through BERT
+        outputs = self.bert(inputs_embeds=input_ids, attention_mask=attention_mask)
+        sequence_output = outputs.last_hidden_state  # Shape: (batch_size, max_length, hidden_size)
+        
+        # Prepare logits for sequence labeling
+        logits = self.bert.pooler.dense(sequence_output)  # Shape: (batch_size, max_length, num_labels)
+        return logits
 
 
 class DataGenerator(Dataset):
@@ -31,7 +52,6 @@ class DataGenerator(Dataset):
             
         self.length = len(self.items)
         self.labels_amount = labels_amount
-        print(self.length)
         
     def __getitem__(self, index):
         filename, label = self.items[index]
