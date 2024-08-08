@@ -2,7 +2,6 @@
 __pycache__/
 *.py[cod]
 *$py.class
-
 # C extensions
 *.so
 datasets/*
@@ -57,7 +56,8 @@ coverage.xml
 .hypothesis/
 .pytest_cache/
 cover/
-
+*.csv
+*.csv
 # Translations
 *.mo
 *.pot
