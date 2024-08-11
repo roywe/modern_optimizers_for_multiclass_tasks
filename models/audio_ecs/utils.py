@@ -55,7 +55,8 @@ class AudioDataset(Dataset):
         data_tensor = data_tensor.squeeze(0)
         # Convert waveform to feature representation if needed (e.g., MFCC, spectrogram)
         # Here we'll just return the raw waveform for simplicity
-        return data_tensor[:40000], label_one_hot  # [sequence_length]
+        return data_tensor, label_one_hot  # [sequence_length]
+    # [:40000]
 # [:40000]
 if __name__ == '__main__':
     print()
