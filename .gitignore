@@ -62,13 +62,14 @@ cover/
 *.mo
 *.pot
 *.png
-*.pickle
+*.txt
 # Django stuff:
 *.log
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
-
+study_20240809/
+*.PNG
 # Flask stuff:
 instance/
 .webassets-cache
