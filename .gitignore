@@ -62,7 +62,6 @@ cover/
 *.mo
 *.pot
 *.png
-*.pickle
 *.txt
 # Django stuff:
 *.log

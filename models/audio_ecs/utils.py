@@ -8,7 +8,7 @@ import os
 from pathlib import Path
 import torchaudio
 import numpy as np
-import pandas as pd
+import pandas as pd 
 
 DEVICE = torch.device('cuda:4' if torch.cuda.is_available() else 'cpu')
 LOSS_CRITERIA = nn.CrossEntropyLoss()
