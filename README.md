@@ -46,8 +46,6 @@ By setting ONLY_10_LABELS=False in models/audio_ecs/utils would run the model wi
 <br>
 <br>
 
-<!-- ![WhatsApp Image 2024-04-07 at 21 04 28_e74cb264](https://github.com/DanielLevi6/046211-Deep-Learning/assets/88712194/c96e8a3b-c3f8-4f27-8d41-56e13096ba48) -->
-
 ## Model
 ### ECS-50 - 
 
