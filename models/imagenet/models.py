@@ -97,93 +97,99 @@ def train_model(model, dataloaders, optimizer, num_epochs=100, device=device, lo
     
     return model, training_acc, val_acc_history,training_loss,val_loss
 
-results_metric = {
-    'Adam':{
-        
-    },
-    'SGD':{
-        
-    },
-    'Adan':{
-        
-    },
-    'Madgrad':{
-        
-    },
-    'Schedulefree':{
-        
+def main():
+
+    results_metric = {
+        'Adam':{
+            
+        },
+        'SGD':{
+            
+        },
+        'Adan':{
+            
+        },
+        'Madgrad':{
+            
+        },
+        'Schedulefree':{
+            
+        }
     }
-}
 
 
-optimizers = ['Adan','SGD','Adam','Madgrad', 'Schedulefree']
+    optimizers = ['Adan','SGD','Adam','Madgrad', 'Schedulefree']
 
-for optimizer_name in optimizers:
+    for optimizer_name in optimizers:
 
-    model = create_finetuned_resnet18().to(device) 
+        model = create_finetuned_resnet18().to(device) 
 
-    final_optimizer_configurations = {
-    'Adam': optim.Adam(model.parameters(), lr=0.0014), #7 min
-    'SGD': torch.optim.SGD(model.parameters(), lr=0.0005, momentum=0.99898, nesterov=True), #11 min
-    'Adan': Adan(model.parameters() , lr=0.0342 , betas= (0.027,0.0178,0.0522) , weight_decay=0.02), #9 min
-    'Madgrad': MADGRAD(params=model.parameters(), lr=0.0043, momentum=0.9420, weight_decay=0, eps= 1e-06, decouple_decay=False),  #9 min
-    'Schedulefree': schedulefree.AdamWScheduleFree(model.parameters(), lr=1e-3)
-    }
+        final_optimizer_configurations = {
+        'Adam': optim.Adam(model.parameters(), lr=0.0014), #7 min
+        'SGD': torch.optim.SGD(model.parameters(), lr=0.0005, momentum=0.99898, nesterov=True), #11 min
+        'Adan': Adan(model.parameters() , lr=0.0342 , betas= (0.027,0.0178,0.0522) , weight_decay=0.02), #9 min
+        'Madgrad': MADGRAD(params=model.parameters(), lr=0.0043, momentum=0.9420, weight_decay=0, eps= 1e-06, decouple_decay=False),  #9 min
+        'Schedulefree': schedulefree.AdamWScheduleFree(model.parameters(), lr=1e-3)
+        }
+        
+        
+        model, training_acc, val_acc_history,training_loss,val_loss = train_model(model, dataloaders,
+                                    final_optimizer_configurations[optimizer_name], num_epochs=100, device=device, loss_criteria = loss_criteria)
+        results_metric[optimizer_name]['training_acc'] = training_acc
+        results_metric[optimizer_name]['val_acc_history'] = val_acc_history
+        results_metric[optimizer_name]['training_loss'] = training_loss
+        results_metric[optimizer_name]['val_loss'] = val_loss
+        results_metric[optimizer_name]['model'] = model
+        
+        path = os.path.join(Path(os.getcwd()),"#location to save dataset") #"046211_modern_optimizers_for_pretrained_models/models/imagenet/trail_one/final_results.pickle"
+
+        with open(path, 'wb') as handle:
+            pickle.dump(results_metric, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+
+def plot_loss_curve(results_metric, only_val=True):
+    plt.figure(figsize=(10, 5))
+    for opt in results_metric:
+        d = results_metric[opt]
     
+        if not only_val:
     
-    model, training_acc, val_acc_history,training_loss,val_loss = train_model(model, dataloaders,
-                                final_optimizer_configurations[optimizer_name], num_epochs=100, device=device, loss_criteria = loss_criteria)
-    results_metric[optimizer_name]['training_acc'] = training_acc
-    results_metric[optimizer_name]['val_acc_history'] = val_acc_history
-    results_metric[optimizer_name]['training_loss'] = training_loss
-    results_metric[optimizer_name]['val_loss'] = val_loss
-    results_metric[optimizer_name]['model'] = model
+            training_loss = [i for i in d['training_loss']]
+            plt.plot(training_loss, label=f'Train Loss {opt}')
+    
+        val_acc_history = [i for i in d['val_loss']]
+
+        plt.plot(val_acc_history, label=f'Validation Loss {opt}')
+    plt.xlabel('Epoch')
+    plt.ylabel('Loss')
+    plt.legend()
+    plt.show()
 
 
-    def plot_loss_curve(results_metric, only_val=True):
-        plt.figure(figsize=(10, 5))
-        for opt in results_metric:
-            d = results_metric[opt]
-        
-            if not only_val:
-        
-                training_loss = [i for i in d['training_loss']]
-                plt.plot(training_loss, label=f'Train Loss {opt}')
-        
-            val_acc_history = [i for i in d['val_loss']]
+def plot_accuracy_curve(results_metric, only_val=True):
+    plt.figure(figsize=(10, 5))
+    for opt in results_metric:
+        d = results_metric[opt]
+        if not only_val:
+            training_loss = [i.cpu().numpy().tolist() for i in d['training_acc']]
+            plt.plot(training_loss, label=f'Train accuracy {opt}')
+        val_acc_history = [i.cpu().numpy().tolist() for i in d['val_acc_history']]
+                    
+        plt.plot(val_acc_history, label=f'Validation accuracy {opt}')
 
-            plt.plot(val_acc_history, label=f'Validation Loss {opt}')
-        plt.xlabel('Epoch')
-        plt.ylabel('Loss')
-        plt.legend()
-        plt.show()
+    plt.xlabel('Epoch')
+    plt.ylabel('Accuracy')
+    plt.legend()
+    plt.show()
 
 
-    def plot_accuracy_curve(results_metric, only_val=True):
-        plt.figure(figsize=(10, 5))
-        for opt in results_metric:
-            d = results_metric[opt]
-            if not only_val:
-                training_loss = [i.cpu().numpy().tolist() for i in d['training_acc']]
-                plt.plot(training_loss, label=f'Train accuracy {opt}')
-            val_acc_history = [i.cpu().numpy().tolist() for i in d['val_acc_history']]
-                        
-            plt.plot(val_acc_history, label=f'Validation accuracy {opt}')
+def show_results():
+    path = os.path.join(Path(os.getcwd()),"#location to save dataset") #"046211_modern_optimizers_for_pretrained_models/models/imagenet/trail_one/final_results.pickle"
+    with open(path, 'rb') as handle:
+        final_results = pickle.load(handle)
+    plot_loss_curve(final_results)
+    plot_accuracy_curve(final_results)
 
-        plt.xlabel('Epoch')
-        plt.ylabel('Accuracy')
-        plt.legend()
-        plt.show()
-
-
-path = os.path.join(Path(os.getcwd()),"046211_modern_optimizers_for_pretrained_models/models/imagenet/trail_one/final_results.pickle")
-
-with open(path, 'wb') as handle:
-    pickle.dump(results_metric, handle, protocol=pickle.HIGHEST_PROTOCOL)
-
-with open(path, 'rb') as handle:
-    final_results = pickle.load(handle)
-plot_loss_curve(final_results)
-plot_accuracy_curve(final_results)
-
-
+if __name__ == '__main__':
+    # main()
+    print()

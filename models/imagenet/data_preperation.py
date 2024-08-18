@@ -13,7 +13,7 @@ from torch.utils.data import DataLoader, random_split
 
 # dataset downloaded from https://www.kaggle.com/datasets/ponrajsubramaniian/sportclassificationdataset
 
-file_path = '/home-sipl/prj7565/Deep_Learning_prj_Tomer/sports'
+file_path = '/home-sipl/prj7565/Deep_Learning_prj_Tomer/sports' #enter path for your datast
 
 
 def data_pre_processing(file_path, valid_split=0.15, test_split=0.15, input_size=(224, 224), image_color='rgb', batch_size=32, shuffle=True):

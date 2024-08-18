@@ -98,41 +98,47 @@ def optune_optimizer_for_model(trial, optimizer_name):
             raise optuna.exceptions.TrialPruned()
 
     return epoch_acc
-# now we can run the experiment
-sampler = optuna.samplers.TPESampler()
-configurations = [
-                {'optimizer_name':'Adam',
-                   'study_name':'adam_study'},
-                  {'optimizer_name':'SGD',
-                   'study_name':'sgd_study'},
-                  {'optimizer_name':'Adan',
-                   'study_name':'adan_study'},
-                  {'optimizer_name':'Madgrad',
-                   'study_name':'madgrad_study'},
-                  ]
-studies = {}
-for config in configurations:
-    
-    study = optuna.create_study(study_name=config['study_name'], direction="maximize", sampler=sampler)
-    study.optimize(lambda trial: optune_optimizer_for_model(trial, config['optimizer_name']), n_trials=NTRAILS, timeout=3*60*60) #trial.report
-    
-    study_csv = f'/home-sipl/prj7565/Deep_Learning_prj_Tomer/optuna_results/{config["study_name"]}.csv'
-    study.trials_dataframe().to_csv(study_csv)
-    studies[config["study_name"]] = study_csv
-    
-    pruned_trials = [t for t in study.trials if t.state == optuna.trial.TrialState.PRUNED]
-    complete_trials = [t for t in study.trials if t.state == optuna.trial.TrialState.COMPLETE]
 
-    print("Study statistics: ")
-    print("  Number of finished trials: ", len(study.trials))
-    print("  Number of pruned trials: ", len(pruned_trials))
-    print("  Number of complete trials: ", len(complete_trials))
-    print("Best trial:")
+def main():
+    # now we can run the experiment
+    sampler = optuna.samplers.TPESampler()
+    configurations = [
+                    {'optimizer_name':'Adam',
+                    'study_name':'adam_study'},
+                    {'optimizer_name':'SGD',
+                    'study_name':'sgd_study'},
+                    {'optimizer_name':'Adan',
+                    'study_name':'adan_study'},
+                    {'optimizer_name':'Madgrad',
+                    'study_name':'madgrad_study'},
+                    ]
+    studies = {}
+    for config in configurations:
+        
+        study = optuna.create_study(study_name=config['study_name'], direction="maximize", sampler=sampler)
+        study.optimize(lambda trial: optune_optimizer_for_model(trial, config['optimizer_name']), n_trials=NTRAILS, timeout=3*60*60) #trial.report
+        
+        study_csv = f'/home-sipl/prj7565/Deep_Learning_prj_Tomer/optuna_results/{config["study_name"]}.csv'
+        study.trials_dataframe().to_csv(study_csv)
+        studies[config["study_name"]] = study_csv
+        
+        pruned_trials = [t for t in study.trials if t.state == optuna.trial.TrialState.PRUNED]
+        complete_trials = [t for t in study.trials if t.state == optuna.trial.TrialState.COMPLETE]
 
-    trial = study.best_trial
+        print("Study statistics: ")
+        print("  Number of finished trials: ", len(study.trials))
+        print("  Number of pruned trials: ", len(pruned_trials))
+        print("  Number of complete trials: ", len(complete_trials))
+        print("Best trial:")
 
-    print("  Value: ", trial.value)
-    print("  Params: ")
+        trial = study.best_trial
 
-    for key, value in trial.params.items():
-        print("    {}: {}".format(key, value))
+        print("  Value: ", trial.value)
+        print("  Params: ")
+
+        for key, value in trial.params.items():
+            print("    {}: {}".format(key, value))
+        
+if __name__ == '__main__':
+    # main()
+    print()
