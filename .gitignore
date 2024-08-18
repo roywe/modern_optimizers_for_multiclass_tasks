@@ -61,14 +61,14 @@ cover/
 # Translations
 *.mo
 *.pot
-*.png
-*.pickle
+
+
 # Django stuff:
 *.log
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
-
+study_20240809/
 # Flask stuff:
 instance/
 .webassets-cache
