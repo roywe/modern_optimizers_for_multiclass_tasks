@@ -9,6 +9,9 @@ import matplotlib.pyplot as plt
 from madgrad import MADGRAD
 from data_preperation import train_loader , test_loader , create_finetuned_resnet18
 import pickle
+import schedulefree
+from pathlib import Path
+import os
 
 
 seed = 20
@@ -38,8 +41,12 @@ def train_model(model, dataloaders, optimizer, num_epochs=100, device=device, lo
         for phase in ['train', 'val']:
             if phase == 'train':
                 model.train()  # Set model to training mode
+                if type(optimizer) == schedulefree.adamw_schedulefree.AdamWScheduleFree:
+                    optimizer.train()
             else:
                 model.eval()   # Set model to evaluate mode
+                if type(optimizer) == schedulefree.adamw_schedulefree.AdamWScheduleFree:
+                    optimizer.eval()
 
             running_loss = 0.0
             running_corrects = 0
@@ -102,21 +109,25 @@ results_metric = {
     },
     'Madgrad':{
         
+    },
+    'Schedulefree':{
+        
     }
 }
 
 
-optimizers = ['Adan','SGD','Adam','Madgrad']
+optimizers = ['Adan','SGD','Adam','Madgrad', 'Schedulefree']
 
 for optimizer_name in optimizers:
 
     model = create_finetuned_resnet18().to(device) 
 
     final_optimizer_configurations = {
-    'Adam': optim.Adam(model.parameters(), lr=0.0098), #7 min
-    'SGD': torch.optim.SGD(model.parameters(), lr=0.0001, momentum=0.9054, nesterov=True), #11 min
-    'Adan': Adan(model.parameters() , lr=0.0166 , betas= (0.057,0.088,0.025) , weight_decay=0.02), #9 min
-    'Madgrad': MADGRAD(params=model.parameters(), lr=0.032, momentum=0.8092, weight_decay=0, eps= 1e-06, decouple_decay=False)  #9 min
+    'Adam': optim.Adam(model.parameters(), lr=0.0014), #7 min
+    'SGD': torch.optim.SGD(model.parameters(), lr=0.0005, momentum=0.99898, nesterov=True), #11 min
+    'Adan': Adan(model.parameters() , lr=0.0342 , betas= (0.027,0.0178,0.0522) , weight_decay=0.02), #9 min
+    'Madgrad': MADGRAD(params=model.parameters(), lr=0.0043, momentum=0.9420, weight_decay=0, eps= 1e-06, decouple_decay=False),  #9 min
+    'Schedulefree': schedulefree.AdamWScheduleFree(model.parameters(), lr=1e-3)
     }
     
     
@@ -145,7 +156,6 @@ for optimizer_name in optimizers:
         plt.xlabel('Epoch')
         plt.ylabel('Loss')
         plt.legend()
-        plt.savefig("/home-sipl/prj7565/Deep_Learning_prj_Tomer/graphs/Loss_ResNet_finetune_withoptuna")
         plt.show()
 
 
@@ -163,14 +173,17 @@ for optimizer_name in optimizers:
         plt.xlabel('Epoch')
         plt.ylabel('Accuracy')
         plt.legend()
-        plt.savefig("/home-sipl/prj7565/Deep_Learning_prj_Tomer/graphs/Acc_ResNet_finetune_withoptuna")
         plt.show()
 
-with open('/home-sipl/prj7565/Deep_Learning_prj_Tomer/study/results_20240811_ResNet_finetune_withoptuna.pickle', 'wb') as handle:
+
+path = os.path.join(Path(os.getcwd()),"046211_modern_optimizers_for_pretrained_models/models/imagenet/trail_one/final_results.pickle")
+
+with open(path, 'wb') as handle:
     pickle.dump(results_metric, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
-with open('/home-sipl/prj7565/Deep_Learning_prj_Tomer/study/results_20240811_ResNet_finetune_withoptuna.pickle', 'rb') as handle:
+with open(path, 'rb') as handle:
     final_results = pickle.load(handle)
 plot_loss_curve(final_results)
 plot_accuracy_curve(final_results)
+
 

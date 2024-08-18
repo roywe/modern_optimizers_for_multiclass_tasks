@@ -11,10 +11,12 @@ from torchvision import models, transforms, datasets
 from torch.utils.data import DataLoader, random_split
 
 
-file_path = 'Location_to_your_dataset_directory/sports'
+# dataset downloaded from https://www.kaggle.com/datasets/ponrajsubramaniian/sportclassificationdataset
+
+file_path = '/home-sipl/prj7565/Deep_Learning_prj_Tomer/sports'
 
 
-def data_pre_processing(file_path, valid_split=0.25, input_size=(224, 224), image_color='rgb', batch_size=32, shuffle=True):
+def data_pre_processing(file_path, valid_split=0.15, test_split=0.15, input_size=(224, 224), image_color='rgb', batch_size=32, shuffle=True):
     # Define the color mode transformation
     if image_color == 'rgb':
         color_mode = transforms.ToTensor()
@@ -46,24 +48,28 @@ def data_pre_processing(file_path, valid_split=0.25, input_size=(224, 224), imag
 
     # Calculate the number of samples for training and validation
     valid_size = int(valid_split * len(full_dataset))
-    train_size = len(full_dataset) - valid_size
+    test_size = int(test_split * len(full_dataset))
+    train_size = len(full_dataset) - valid_size - test_size
+
 
     # Split the dataset into training and validation sets
-    train_data, val_data = random_split(full_dataset, [train_size, valid_size])
+    train_data, val_data , test_data = random_split(full_dataset, [train_size, valid_size , test_size])
 
     # Apply the respective transforms
     train_data.dataset.transform = train_transform
     val_data.dataset.transform = val_transform
+    test_data.dataset.transform = val_transform
 
     # Create DataLoaders for training and validation
     train_loader = DataLoader(train_data, batch_size=batch_size, shuffle=shuffle , num_workers=4 , pin_memory=True)
-    val_loader = DataLoader(val_data, batch_size=batch_size, shuffle=False , num_workers=4 , pin_memory=True)
+    val_loader = DataLoader(val_data, batch_size=batch_size, shuffle=True , num_workers=4 , pin_memory=True)
+    test_loader = DataLoader(test_data, batch_size=batch_size, shuffle=False , num_workers=4 , pin_memory=True)
     full_loader = DataLoader(full_dataset , batch_size=batch_size , shuffle=False , num_workers=4 , pin_memory=True)
 
-    return train_loader, val_loader , full_loader
+    return train_loader, val_loader , test_loader , full_loader
 
 
-train_loader, test_loader , clean_loader = data_pre_processing(file_path)
+train_loader, val_loader , test_loader , full_dataset = data_pre_processing(file_path)
 
 
 def show_images_with_labels(data_loader, num_images=9):
@@ -113,10 +119,9 @@ def show_images_with_labels(data_loader, num_images=9):
 
     # Adjust layout and show the plot
     plt.tight_layout()
-    plt.savefig("fig")
     plt.show()
 
-# show_images_with_labels(clean_loader , 9)
+show_images_with_labels(full_dataset , 9)
 
 def plot_label_distribution_pie(data_loader):
     # Get all labels from the data_loader
@@ -138,47 +143,11 @@ def plot_label_distribution_pie(data_loader):
     plt.title('Distribution of Pictures Across Classes')
     
     # Show the plot
-    plt.savefig("labels")
     plt.show()
 
-# plot_label_distribution_pie(clean_loader)
+plot_label_distribution_pie(full_dataset)
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-
-# class MiniVGGNet(nn.Module):
-#     def __init__(self, num_classes=22):
-#         super(MiniVGGNet, self).__init__()
-#         self.conv1 = nn.Conv2d(in_channels=3, out_channels=16, kernel_size=3, padding=1)
-#         self.bn1 = nn.BatchNorm2d(16)
-#         self.conv2 = nn.Conv2d(in_channels=16, out_channels=16, kernel_size=3, padding=1)
-#         self.bn2 = nn.BatchNorm2d(16)
-        
-#         self.conv3 = nn.Conv2d(in_channels=16, out_channels=32, kernel_size=3, padding=1)
-#         self.bn3 = nn.BatchNorm2d(32)
-#         self.conv4 = nn.Conv2d(in_channels=32, out_channels=32, kernel_size=3, padding=1)
-#         self.bn4 = nn.BatchNorm2d(32)
-
-#         self.fc1 = nn.Linear(in_features=32 * 16 * 16, out_features=256)
-#         self.fc2 = nn.Linear(in_features=256, out_features=num_classes)
-
-#     def forward(self, x):
-#         x = F.relu(self.bn1(self.conv1(x)))
-#         x = F.relu(self.bn2(self.conv2(x)))
-#         x = F.max_pool2d(x, kernel_size=2, stride=2)
-        
-#         x = F.relu(self.bn3(self.conv3(x)))
-#         x = F.relu(self.bn4(self.conv4(x)))
-#         x = F.max_pool2d(x, kernel_size=2, stride=2)
-        
-#         x = torch.flatten(x, 1)
-#         x = F.relu(self.fc1(x))
-#         x = F.dropout(x, p=0.5, training=self.training)
-#         x = self.fc2(x)
-        
-#         return x
-
-# # Create an instance of the model
-# cnn_model = MiniVGGNet(num_classes=22)
 
 def create_finetuned_resnet18(num_classes=22):
     
@@ -206,5 +175,5 @@ def create_finetuned_resnet18(num_classes=22):
 model = create_finetuned_resnet18()
 
 # how many weights (trainable parameters) we have in our model? 
-num_trainable_params = sum([p.numel() for p in model.parameters() if p.requires_grad]) 
-print("num trainable weights: ", num_trainable_params)
+# num_trainable_params = sum([p.numel() for p in model.parameters() if p.requires_grad]) 
+# print("num trainable weights: ", num_trainable_params)

@@ -6,9 +6,10 @@ import time
 import matplotlib.pyplot as plt
 from torch.utils.data import DataLoader
 import optuna
-from data_preperation import create_finetuned_resnet18 , train_loader , test_loader
+from data_preperation import create_finetuned_resnet18 , train_loader , val_loader
 from adan_pytorch import Adan
 import pandas as pd
+
 
 batch_size = 32
 num_labels = 22
@@ -19,7 +20,7 @@ NTRAILS = 100
 
 dataloaders = {
     'train':train_loader,
-    'val':test_loader
+    'val':val_loader
 }
 
 def optune_optimizer_for_model(trial, optimizer_name):
