@@ -111,14 +111,19 @@ the Requirements.txt file in this repo can be used to download all of the requir
 
 #### Train Results
 
+<img src="models/imagenet/results/Acc_Train.png" alt="screenshot" width="490"/>
 
+
+<img src="models/imagenet/results/Loss_Train.png" alt="screenshot" width="490"/>
 
 As we can see from the training graphs all optimizers but Adan reach the 100% accuracy and 0 loss.
 We can see that schedule free converged the fastest to 100% accuracy, followed by Adam, SGD and Madgrad. 
 
 #### Test Results
 
+<img src="models/imagenet/results/Acc_Val.png" alt="screenshot" width="490"/>
 
+<img src="models/imagenet/results/Loss_Val.png" alt="screenshot" width="490"/>
 
 From the validation graphs we can see how SGD performs the best while Adam under-performed significantly compared to the others. 
 We can see that Madgrad performed on the same level as Adam. 
