@@ -6,13 +6,13 @@ Every optimizer show state of the art performance for many common tasks.
 
 ## Overview
 In the recent years, new optimization methods arise.
-while Adam is well known and used, different optimization technique claims that they are superior for specific cases.
+While Adam is well known and used, different optimization technique claims that they are superior for specific cases.
 
 - Adan - (https://arxiv.org/pdf/2208.06677) uses nestrov acceleration differently show Sota results for vision transformer, bert and gpt and promsing results for RL method.
-    further download and documentation is here: (https://github.com/lucidrains/Adan-pytorch/tree/main)
+    Further download and documentation is here: (https://github.com/lucidrains/Adan-pytorch/tree/main)
 
-- Madgrad - (https://arxiv.org/pdf/2101.11075) - uses dual-averaging method which average the gradients over time. With that it should be more stable and converge better 
-    further download and documentation is here: (https://github.com/facebookresearch/madgrad)
+- Madgrad - (https://arxiv.org/pdf/2101.11075) - uses dual-averaging method which average the gradients over time. With that it should be more stable and converge better. 
+    Further download and documentation is here: (https://github.com/facebookresearch/madgrad)
 
 - Schedule free - (https://arxiv.org/pdf/2405.15682) Is a new scheduling technique using many optimization technique as adaptability, averaging, nestrov acceleration.
 
@@ -24,7 +24,7 @@ We tested SGD, Adam, Madgrad, Adan and ScheduleFree with the 2 tasks and checked
 
 We chose the following tasks:
 -  ECS-50 Audio Dataset for multiclass NLP classification using Hubert
--  image............................ 
+-  Sport images dataset classification for vision task using pretrained ResNet-18
 
 
 ## Data
@@ -36,24 +36,32 @@ ECS - (https://github.com/karoldvl/ESC-50)
 - 40 audio records 
 - 5 seconds each
 
-we ran this project with only 10 classes (that are in ECS-10). In this github we can see the top models performances. 
+We ran this project with only 10 classes (that are in ECS-10). In this github we can see the top models performances. 
 
 By setting ONLY_10_LABELS=False in models/audio_ecs/utils would run the model with 50 classes rather then 10
 
 
 ### Sport-images:
 
-<br>
-<br>
+The datasets for the tasks include:
+Sports images dataset - (https://www.kaggle.com/datasets/ponrajsubramaniian/sportclassificationdataset) 
+- Total of 14000 images
+- 22 classes of different sports
+- About 700 images in each class
+- Each image can contain the ball, court, players or a combination of these objects.
 
 ## Model
 ### ECS-50 - 
 
-we used well known model for audio named Hubert - (https://arxiv.org/pdf/2106.07447)
+We used well known model for audio named Hubert - (https://arxiv.org/pdf/2106.07447)
 
-this is a transformer based on Bert using CNN for the first layers and projection after the end layers.
+This is a transformer based on Bert using CNN for the first layers and projection after the end layers.
 
-Sport-images:
+### Pretrained ResNet-18 - 
+
+We tried many different models, but we opt to use the pretrained ResNet-18, while finetuning the last convolution and fully-connected layers. 
+
+This adds up to above 8 million parameters. 
 
 
 ## Repository Structure
@@ -80,26 +88,46 @@ the Requirements.txt file in this repo can be used to download all of the requir
 
 ## Results Summary
 
-Audio: 
+### Audio: 
 
-### first failure - madgrad without gradient clipping perform really bad:
+#### First failure - Madgrad without gradient clipping perform really bad:
 
 ![screenshot](models/audio_ecs/results/madgrad_failure.PNG)
 
-### first Trail using hyperparameters:
+#### First Trail using hyperparameters:
 
 ![screenshot](models/audio_ecs/results/first_trail_train.PNG)
 ![screenshot](models/audio_ecs/results/first_trail_validation.PNG)
 
-### Second Trail using hyperparameters:
+#### Second Trail using hyperparameters:
 ![screenshot](models/audio_ecs/results/second_trail_train.PNG)
 ![screenshot](models/audio_ecs/results/second_trail_validation.PNG)
 
-### Second Trail for more epochs:
+#### Second Trail for more epochs:
 
 ![screenshot](models/audio_ecs/results/second_trail_500.PNG)
 
+### Images:
 
+#### Train Results
+
+<img src="models/imagenet/results/Acc_Train.png" alt="screenshot" width="490"/>
+
+
+<img src="models/imagenet/results/Loss_Train.png" alt="screenshot" width="490"/>
+
+As we can see from the training graphs all optimizers but Adan reach the 100% accuracy and 0 loss.
+We can see that schedule free converged the fastest to 100% accuracy, followed by Adam, SGD and Madgrad. 
+
+#### Test Results
+
+<img src="models/imagenet/results/Acc_Val.png" alt="screenshot" width="490"/>
+
+<img src="models/imagenet/results/Loss_Val.png" alt="screenshot" width="490"/>
+
+From the validation graphs we can see how SGD performs the best while Adam under-performed significantly compared to the others. 
+We can see that Madgrad performed on the same level as Adam. 
+In the loss graphs for the validation, we can see how the optimizers reach the minimum point very early, this could be attributed to the model being pretrained. 
 
 ## Conclusion
 
@@ -123,18 +151,31 @@ for noisy optimizers we recommend for early stopping ​
     we may see better performance than Adam.
     so we recommend try using schedule free and Adan 
 
+### Images
+1. Train vs Validation – ​
+
+    - train - ScheduleFree , SGD, Adam and Madgrad​ - converge faster for this task (in this order), while Adan failed to reach 100% accuracy.
+
+    - val - SGD outperformed all other optimizers, while Madgrad reached the same level as Adam and ScheduleFree, and Adan under-performed.
+
+2. Generalization - our chosen dataset was small and consists of images with many different features. This might have hurt when the model tried to generalize.
+
+3. Who is better? We expect that with a different dataset that is larger and has more specific objects in it's images, Madgrad, Adan and ScheduleFree will perform better.
+
 
 ## Future Work
 
-- **Training more for a simple task::**
+- **Training more for a simple task:**
     
     We would like to see a clear separation in the graphs for a specific task.  
 
     We couldn't match the amount of training for the 3 optimizers with our computation resources and maybe that is the reason why. 
 
-    training for a simple task but for many epochs would help to see any seperattion as in the article
+    Training for a simple task but for many epochs would help to see any seperattion as in the article
 
 - **Check image classification with specific objects:**
+
+    Selecting a larger dataset with more specific objects in them could help the results.
 
 ## Contact
 For inquiries or further information, please contact roy.weber@campus.technion.ac.il, tomer.rudich@campus.technion.ac.il
