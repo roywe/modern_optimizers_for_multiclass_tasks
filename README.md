@@ -70,8 +70,15 @@ This adds up to above 8 million parameters.
     - models/audio_ecs - folder for the audio task:
         - data_preperation - showing some analysis and details about the data
         - model - file to train the model
-        - optimizers_optuna - file for optune optimizers hyperparameters for our specific task
+        - optimizers_optuna - file for optune optimizers hyperparameters for specific task
         - utils - general functions used for the files above  
+        - trail_one + trail_two + results - result files we saved after training
+
+    - models/imagenet - folder for the audio task:
+        - data_preperation - showing some analysis and details
+        - model - file to train the images model
+        - optuna_trail - file for optune optimizers hyperparameters for specific task
+        - trail_one + results - result files we saved after training
 
 
 
@@ -125,6 +132,7 @@ We couldn't see clear seperation between optimizers also for 500 minutes but we 
 <img src="models/imagenet/results/Loss_Train.png" alt="screenshot" width="490"/>
 
 As we can see from the training graphs all optimizers but Adan reach the 100% accuracy and 0 loss.
+
 We can see that schedule free converged the fastest to 100% accuracy, followed by Adam, SGD and Madgrad. 
 
 #### Test Results
@@ -134,7 +142,9 @@ We can see that schedule free converged the fastest to 100% accuracy, followed b
 <img src="models/imagenet/results/Loss_Val.png" alt="screenshot" width="490"/>
 
 From the validation graphs we can see how SGD performs the best while Adam under-performed significantly compared to the others. 
+
 We can see that Madgrad performed on the same level as Adam. 
+
 In the loss graphs for the validation, we can see how the optimizers reach the minimum point very early, this could be attributed to the model being pretrained. 
 
 ## Conclusion
