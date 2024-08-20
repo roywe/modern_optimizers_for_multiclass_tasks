@@ -65,7 +65,7 @@ This adds up to above 8 million parameters.
 
 
 ## Repository Structure
-- **optimizers:** containing simple check we did with the optimizers
+- **optimizers:** containing simple validations for the optimizers libraries
 - **models:**  containing code for the two task - audio_ecs and imagenet
     - models/audio_ecs - folder for the audio task:
         - data_preperation - showing some analysis and details about the data
@@ -90,22 +90,30 @@ the Requirements.txt file in this repo can be used to download all of the requir
 
 ### Audio: 
 
-#### First failure - Madgrad without gradient clipping perform really bad:
+#### First failure - Madgrad without gradient clipping perform really bad (as Authors of Madgrad declared):
 
 ![screenshot](models/audio_ecs/results/madgrad_failure.PNG)
 
 #### First Trail using hyperparameters:
+We can see Adan, Adam and scheduleFree​ - converge fast for this task:
+
+In the validation also Madgrad reach the same point but more slowly
 
 ![screenshot](models/audio_ecs/results/first_trail_train.PNG)
 ![screenshot](models/audio_ecs/results/first_trail_validation.PNG)
 
 #### Second Trail using hyperparameters:
+We can see similar performances for same optimizers for different hyperparameters:
+
 ![screenshot](models/audio_ecs/results/second_trail_train.PNG)
 ![screenshot](models/audio_ecs/results/second_trail_validation.PNG)
 
 #### Second Trail for more epochs:
+We couldn't see clear seperation between optimizers also for 500 minutes but we can see noise performance:
 
 ![screenshot](models/audio_ecs/results/second_trail_500.PNG)
+
+
 
 ### Images:
 
@@ -143,6 +151,7 @@ In the loss graphs for the validation, we can see how the optimizers reach the m
     - val - the optimizers reach a similar point 
 
 4. Noise - Adam and scheduleFree were the most smooth - Madgrad and Adan were more noisy
+
 for noisy optimizers we recommend for early stopping ​
 
 5. Who is better? we didnt see a clear separation in the accuracy for the models– ​
