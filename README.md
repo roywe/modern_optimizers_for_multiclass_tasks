@@ -1,4 +1,4 @@
-# 046211 sota optimizers for multiclass tasks
+# 046211 modern optimizers for multiclass tasks
 Welcome to the to our project repository.
 This repository houses the code and resources for checking Adan, Madgrad, ScheduleFree new optimizers performances on Audio and image classifications tasks.
 Our main goal is to check which optimizer perform the best for those task validating their articles.
