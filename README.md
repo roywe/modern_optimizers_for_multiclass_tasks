@@ -91,7 +91,7 @@ To utilize our earthquake prediction model, follow these steps:
 5. **Evaluate Results:** Examine predictions and evaluate model performance.
 
 ## Libraries Used
-the Requirements.txt file in this repo can be used to download all of the required libraries.
+Can be found in **Requirements.txt** file
 
 ## Results Summary
 
@@ -160,8 +160,7 @@ In the loss graphs for the validation, we can see how the optimizers reach the m
 
     - val - the optimizers reach a similar point 
 
-4. Noise - Adam and scheduleFree were the most smooth - Madgrad and Adan were more noisy
-
+4. Noise - Adam and scheduleFree were the most smooth - Madgrad and Adan were more noisy.
 for noisy optimizers we recommend for early stopping ​
 
 5. Who is better? we didnt see a clear separation in the accuracy for the models– ​
